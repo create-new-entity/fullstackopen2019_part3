@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "This repository is the continuing work of my [fullstackopen2019](https://github.com/imran-pavel/fullstackopen2019) repository. Course author [suggested](https://fullstackopen.com/en/part3/node_js_and_express#exercises) to have a separate repo for this particular part. So here it is.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "watch": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imran-pavel/fullstackopen2019_part3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imran-pavel/fullstackopen2019_part3/issues"
+  },
+  "homepage": "https://github.com/imran-pavel/fullstackopen2019_part3#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.1"
+  }
+}
