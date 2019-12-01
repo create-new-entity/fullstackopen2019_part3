@@ -1,8 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 
 morgan.token('post-request-data', (req, res) => JSON.stringify(req.body));
 app.use(bodyParser.json());
@@ -97,7 +99,7 @@ app.post('/api/persons', (req, res) => {
 });
 
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log('Server listening on', PORT);
 });
