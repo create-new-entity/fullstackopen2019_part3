@@ -75,10 +75,10 @@ app.post('/api/persons', (req, res) => {
 //     res.send(`<p>${info}</p><p>${time}</p>`);
 // });
 
-// app.delete('/api/persons/:id', (req, res) => {
-//     persons = persons.filter((person) => person.id !== Number(req.params.id));
-//     res.status(204).end();
-// });
+app.delete('/api/persons/:id', (req, res) => {
+    persons = persons.filter((person) => person.id !== Number(req.params.id));
+    res.status(204).end();
+});
 
 
 
