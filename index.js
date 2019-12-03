@@ -23,7 +23,7 @@ app.get('/api/persons', (req, res) => {
             res.send(persons);
         })
         .catch((error) => {
-            res.status(500).json({error: 'DB Connection failed'});
+            res.status(500).json({ error: 'DB Connection failed' });
         });
 });
 
@@ -33,7 +33,7 @@ app.post('/api/persons', (req, res, next) => {
         name: req.body.name,
         phone: req.body.phone
     });
-    
+
     newPerson
         .save()
         .then((savedPerson) => {
@@ -58,7 +58,7 @@ app.get('/api/persons/:id', (req, res, next) => {
         });
 });
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
     PersonModel
         .countDocuments({})
         .then((count) => {
@@ -67,7 +67,6 @@ app.get('/info', (req, res) => {
             res.send(`<p>${info}</p><p>${time}</p>`);
         })
         .catch(error => next(error));
-    
 });
 
 app.delete('/api/persons/:id', (req, res, next) => {
@@ -91,7 +90,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     };
 
     PersonModel
-        .findByIdAndUpdate(req.params.id, updatedPerson, {new: true, runValidators: true, context: 'query'})
+        .findByIdAndUpdate(req.params.id, updatedPerson, { new: true, runValidators: true, context: 'query' })
         .then((updatedPerson) => {
             res.send(updatedPerson.toJSON());
         })
@@ -100,18 +99,18 @@ app.put('/api/persons/:id', (req, res, next) => {
 
 const errorHandler = (error, req, res, next) => {
     // console.log(error);
-    
+
     if(error.name === 'ValidationError'){
         return res.status(400).send({ error: error.message });
     }
 
     if (error.name === 'CastError' && error.kind === 'ObjectId') {
-        return res.status(400).send({ error: 'malformatted id' })
-    } 
+        return res.status(400).send({ error: 'malformatted id' });
+    }
 
     res.send(error);
-}
-  
+};
+
 app.use(errorHandler);
 
 
