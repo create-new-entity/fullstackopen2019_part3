@@ -10,7 +10,7 @@ const app = express();
 
 morgan.token('post-request-data', (req, res) => JSON.stringify(req.body));
 app.use(cors());
-app.use(express.static('build'));
+// app.use(express.static('build'));
 app.use(bodyParser.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-request-data'));
 
@@ -59,26 +59,69 @@ app.post('/api/persons', (req, res) => {
         });
 });
 
-// app.get('/api/persons/:id', (req, res) => {
-//     let person = persons.find((person) => person.id === Number(req.params.id));
-//     if(person){
-//         res.json(person);
-//     }
-//     else{
-//         res.status(404).end();
-//     }
-// });
+app.get('/api/persons/:id', (req, res, next) => {
+    PersonModel
+        .findById(req.params.id)
+        .then((person) => {
+            if(person){
+                res.json(person.toJSON());
+            }
+            else res.status(404).end();
+        })
+        .catch((error) => {
+            next(error);
+        });
+});
 
-// app.get('/info', (req, res) => {
-//     let info = `Phonebook has info for ${persons.length} people`;
-//     let time = new Date();
-//     res.send(`<p>${info}</p><p>${time}</p>`);
-// });
+app.get('/info', (req, res) => {
+    PersonModel
+        .countDocuments({})
+        .then((count) => {
+            let info = `Phonebook has info for ${count} people`;
+            let time = new Date();
+            res.send(`<p>${info}</p><p>${time}</p>`);
+        })
+        .catch(error => next(error));
+    
+});
 
-// app.delete('/api/persons/:id', (req, res) => {
-//     persons = persons.filter((person) => person.id !== Number(req.params.id));
-//     res.status(204).end();
-// });
+app.delete('/api/persons/:id', (req, res, next) => {
+    PersonModel
+        .findByIdAndRemove(req.params.id)
+        .then((removedPerson) => {
+            if(removedPerson){
+                console.log(removedPerson);
+                res.status(204).end();
+            }
+            else{
+                console.log('Person not found in DB');
+                res.end();
+            }
+        })
+        .catch((error) => next(error));
+});
+
+app.put('/api/persons/:id', (req, res, next) => {
+    let updatedPerson = req.body;
+    PersonModel
+        .findByIdAndUpdate(req.params.id, updatedPerson, {new: true})
+        .then((updatedPerson) => {
+            res.send(updatedPerson.toJSON());
+        })
+        .catch(error => next(error));
+});
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+
+    if (error.name === 'CastError' && error.kind === 'ObjectId') {
+        return res.status(400).send({ error: 'malformatted id' })
+    } 
+
+    res.end();
+}
+  
+app.use(errorHandler);
 
 
 
