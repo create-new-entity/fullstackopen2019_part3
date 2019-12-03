@@ -10,7 +10,7 @@ const app = express();
 
 morgan.token('post-request-data', (req, res) => JSON.stringify(req.body));
 app.use(cors());
-// app.use(express.static('build'));
+app.use(express.static('build'));
 app.use(bodyParser.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-request-data'));
 
@@ -20,8 +20,6 @@ app.get('/api/persons', (req, res) => {
     PersonModel
         .find({})
         .then((persons) => {
-            console.log('Phonebook:');
-            console.log(persons);
             res.send(persons);
         })
         .catch((error) => {
@@ -30,18 +28,7 @@ app.get('/api/persons', (req, res) => {
 });
 
 
-app.post('/api/persons', (req, res) => {
-    if(!req.body.name){
-        return res.status(400).json({
-            error: 'name missing'
-        });
-    }
-    if(!req.body.phone){
-        return res.status(400).json({
-            error: 'phone number missing'
-        });
-    }
-
+app.post('/api/persons', (req, res, next) => {
     const newPerson = new PersonModel({
         name: req.body.name,
         phone: req.body.phone
@@ -50,12 +37,10 @@ app.post('/api/persons', (req, res) => {
     newPerson
         .save()
         .then((savedPerson) => {
-            console.log('Saved', savedPerson);
             res.send(savedPerson.toJSON());
         })
         .catch((error) => {
-            console.log("Could not save new entry to DB");
-            res.status(500).json({error: "Could not save new entry to DB"});
+            next(error);
         });
 });
 
@@ -90,11 +75,9 @@ app.delete('/api/persons/:id', (req, res, next) => {
         .findByIdAndRemove(req.params.id)
         .then((removedPerson) => {
             if(removedPerson){
-                console.log(removedPerson);
                 res.status(204).end();
             }
             else{
-                console.log('Person not found in DB');
                 res.end();
             }
         })
@@ -102,9 +85,13 @@ app.delete('/api/persons/:id', (req, res, next) => {
 });
 
 app.put('/api/persons/:id', (req, res, next) => {
-    let updatedPerson = req.body;
+    let updatedPerson = {
+        name: req.body.name,
+        phone: req.body.phone
+    };
+
     PersonModel
-        .findByIdAndUpdate(req.params.id, updatedPerson, {new: true})
+        .findByIdAndUpdate(req.params.id, updatedPerson, {new: true, runValidators: true, context: 'query'})
         .then((updatedPerson) => {
             res.send(updatedPerson.toJSON());
         })
@@ -112,20 +99,24 @@ app.put('/api/persons/:id', (req, res, next) => {
 });
 
 const errorHandler = (error, req, res, next) => {
-    console.error(error.message);
+    // console.log(error);
+    
+    if(error.name === 'ValidationError'){
+        return res.status(400).send({ error: error.message });
+    }
 
     if (error.name === 'CastError' && error.kind === 'ObjectId') {
         return res.status(400).send({ error: 'malformatted id' })
     } 
 
-    res.end();
+    res.send(error);
 }
   
 app.use(errorHandler);
 
 
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log('Server listening on', PORT);
 });

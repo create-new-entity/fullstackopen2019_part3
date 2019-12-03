@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+
 
 const url = "mongodb+srv://fullstack:Snowcat__3@fullstackopen2019-s0yy1.mongodb.net/phonebook?retryWrites=true&w=majority";
 
+mongoose.set('useFindAndModify', false)
 mongoose
     .connect(url, { useNewUrlParser: true })
     .then((result) => {
@@ -12,9 +15,22 @@ mongoose
     });
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    phone: String
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: 3
+    },
+    phone: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: 8
+    }
 });
+
+personSchema.plugin(uniqueValidator);
+
 
 personSchema.set('toJSON', {
     transform: (document, returnedObject) => {

@@ -3,5 +3,5 @@ content-type: application/json
 
 {
       "name": "Kazuhira Miller",
-      "phone": "041-7634897654"
+      "phone": "763"
 }
