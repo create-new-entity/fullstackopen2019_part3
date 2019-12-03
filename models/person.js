@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const url = process.env.MONGO_URI;
+const url = "mongodb+srv://fullstack:Snowcat__3@fullstackopen2019-s0yy1.mongodb.net/phonebook?retryWrites=true&w=majority";
 
 mongoose
     .connect(url, { useNewUrlParser: true })
